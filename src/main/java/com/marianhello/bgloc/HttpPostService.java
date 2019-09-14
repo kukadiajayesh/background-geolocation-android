@@ -1,7 +1,7 @@
 package com.marianhello.bgloc;
 
 import android.os.Build;
-
+import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -18,6 +18,10 @@ import java.util.Iterator;
 import java.net.URL;
 import java.net.HttpURLConnection;
 import java.io.OutputStreamWriter;
+
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.lang.StringBuffer;
 
 public class HttpPostService {
     public static final int BUFFER_SIZE = 1024;
@@ -63,6 +67,7 @@ public class HttpPostService {
     }
 
     public int postJSONString(String body, Map headers) throws IOException {
+        Log.e("postJSONString ", body);
         if (headers == null) {
             headers = new HashMap();
         }
@@ -77,20 +82,40 @@ public class HttpPostService {
             Map.Entry<String, String> pair = it.next();
             conn.setRequestProperty(pair.getKey(), pair.getValue());
         }
-
         OutputStreamWriter os = null;
         try {
             os = new OutputStreamWriter(conn.getOutputStream());
             os.write(body);
-
         } finally {
             if (os != null) {
                 os.flush();
                 os.close();
             }
         }
-
+        Log.e("postJSONString response ", readRespo(conn));
         return conn.getResponseCode();
+    }
+
+    public String readRespo(HttpURLConnection conn){
+        String reply="";
+        try{
+
+            InputStream in = conn.getInputStream();
+            StringBuffer sb = new StringBuffer();
+            try {
+                int chr;
+                while ((chr = in.read()) != -1) {
+                    sb.append((char) chr);
+                }
+                reply = sb.toString();
+            } finally {
+                in.close();
+            }
+        }catch (IOException e){
+
+        }
+
+        return reply;
     }
 
     public int postJSONFile(File file, Map headers, UploadingProgressListener listener) throws IOException {

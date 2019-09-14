@@ -6,6 +6,7 @@ import com.marianhello.logging.LoggerManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -132,10 +133,12 @@ public class PostLocationTask {
 
     private boolean postLocation(BackgroundLocation location) {
         logger.debug("Executing PostLocationTask#postLocation");
-        JSONArray jsonLocations = new JSONArray();
+        //JSONArray jsonLocations = new JSONArray();
+        JSONObject jsonLocations = new JSONObject();
 
         try {
-            jsonLocations.put(mConfig.getTemplate().locationToJson(location));
+            //jsonLocations.put(mConfig.getTemplate().locationToJson(location));
+            jsonLocations = new JSONObject(mConfig.getTemplate().locationToJson(location).toString());
         } catch (JSONException e) {
             logger.warn("Location to json failed: {}", location.toString());
             return false;
@@ -153,6 +156,7 @@ public class PostLocationTask {
             return false;
         }
 
+        logger.warn("postJSONString responseCode: {}", responseCode);
         if (responseCode == 285) {
             // Okay, but we don't need to continue sending these
 
